@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Kathmandu Map</title>
+    <link rel="stylesheet" href="app.css">
+</head>
+
+<body>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <div id="menuIcon" data-bind="click: hideSideBar">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    <div class="container">
+        <div class="options-box">
+            <h2>Extract from Wikipedia</h2>
+            <div>
+                <p>
+                    <textarea id="textbox" style="width:250px; height:100px"></textarea>
+                </p>
+                <input id="filter-text" type="search" placeholder="Enter what you want to filter" data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off">
+            </div>
+            <ul id="location-list" data-bind="foreach: locationList">
+                <li>
+                    <button data-bind="text: title, event: { mouseover: $parent.highlightMarker, mouseout: $parent.defaultMarker }, click: $parent.popInfo"></button>
+                </li>
+            </ul>
+        </div>
+        <div id="map"></div>
+    </div>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6UxP3FZOY5rLgBbe_aG201JJr2kbIeoA&v=3&callback=initMap"></script>
+    <script src="knockout-3.2.0.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
