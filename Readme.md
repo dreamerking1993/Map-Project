@@ -1,4 +1,4 @@
-# FEED READER TESTING USING JASMINE
+# Neigborhood Map Project FEND
 
 ### How to run this test:
 1) Downoad the zip file.
