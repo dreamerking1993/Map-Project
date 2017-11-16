@@ -321,71 +321,52 @@ var ViewModel = {
 
 };
 
-/* #########fetching data from wikipedia */
+/* #########fetching data from wikipedia*/
 
 function startFetch(minimumCharacters, maximumCharacters, isRetry) {
-    try {
-        if (tempscript) {
-            return;
-        } // a fetch is already in progress
-    } catch (e) {
-        alert('There was an error with the call. Please refresh the page and try again to load Wikipedia data.');
+
+$.ajax({
+    url: "https://en.wikipedia.org/w/api.php",
+    data: {
+        format: "json",
+        action: "parse",
+        page: searchedForText,
+        prop:"text",
+        section:0,
+    },
+    dataType: 'jsonp',
+  /*  headers: {
+        'x-my-custom-header': 'some value'
+    }, */
+    success: function (data) {
+        console.log(data)
+  //     $("#article").html(data.parse.text["*"])
+        
+        var markup = data.parse.text["*"];
+        var i = $('<div></div>').html(markup);
+        
+        // remove links as they will not work
+        i.find('a').each(function() { $(this).replaceWith($(this).html()); });
+        
+        // remove any references
+        i.find('sup').remove();
+        
+        // remove cite error
+        i.find('.mw-ext-cite-error').remove();
+
+        s = $(i).find('p');
+        
+        $('#article').html(s);
+
+
     }
-    if (!isRetry) {
-        attempts = 0;
-        minchars = minimumCharacters; // save params in case retry needed
-        maxchars = maximumCharacters;
-    }
-    tempscript = document.createElement("script");
-    tempscript.type = "text/javascript";
-    tempscript.id = "tempscript";
-    tempscript.src = "http://en.wikipedia.org/w/api.php" +
-        "?action=query&prop=extracts&exintro=&explaintext=&titles=" + searchedForText + " " +
-        "&exchars=" + maxchars + "&format=json&callback=onFetchComplete&requestid=" +
-        Math.floor(Math.random() * 999999).toString();
-    document.body.appendChild(tempscript);
-    // onFetchComplete invoked when finished
-    //https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=&explaintext=&titles=Kathmandu
+});
 }
 
-function onFetchComplete(data) {
-    document.body.removeChild(tempscript);
-    tempscript = null;
-    var s = getFirstProp(data.query.pages).extract;
-    //if the location name clicked is not on wikipedia then..
-    if (s === undefined) {
-        //debugger
-        textbox.value = 'search item not found';
-    } else { //if the location name is found on wikipedia..
-        s = htmlDecode(stripTags(s));
-        if (s.length > minchars || attempts++ > 5) {
-            textbox.value = s;
 
-        } else {
-            startFetch(0, 0, true); // retry
-        }
-    }
-}
 
-function getFirstProp(obj) {
-    for (var i in obj) {
-        if (obj.hasOwnProperty(i)) {
-            return obj[i];
-        }
-    }  
-}
 
-function stripTags(s) {
-    return s.replace(/<\w+(\s+("[^"]*"|'[^']*'|[^>])+)?>|<\/\w+>/gi, "");
-}
 
-function htmlDecode(input) {
-    var e = document.createElement("div");
-    e.innerHTML = input;
-    return e.childNodes.length === 0 ? "" : e.childNodes[0].nodeValue;
-}
-
-/*############################################## */
 
 
 ViewModel.ram();
