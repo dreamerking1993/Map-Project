@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kathmandu Map</title>
     <link rel="stylesheet" href="app.css">
 </head>
@@ -19,8 +19,6 @@
         <div class="options-box">
             <h2>Extract from Wikipedia</h2>
             <div>
-                <div id="article" data-bind="html: textt"></div>
-
                 <input id="filter-text" type="search" placeholder="Filter location you want" data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off">
             </div>
             <ul id="location-list" data-bind="foreach: locationList">

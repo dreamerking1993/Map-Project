@@ -1,8 +1,8 @@
-var map, largeInfowindow, defaultIcon, bounds, highlightedIcon, text;
+var map, largeInfowindow, defaultIcon, bounds, highlightedIcon;
 let searchedForText;
 var markers = [];
 var locations = [{
-        title: 'Pashupatinath Temple',
+        title: 'Pashupati',
         location: {
             lat: 27.7105,
             lng: 85.3487
@@ -37,7 +37,7 @@ var locations = [{
         }
     },
     {
-        title: 'Budhanilkantha Temple',
+        title: 'Budhanilkantha Mandir',
         location: {
             lat: 27.7654,
             lng: 85.3653
@@ -224,13 +224,13 @@ var MarkerProp = {
 
     },
 
-//when marker in the map is clicked
+    //when marker in the map is clicked
     markerClick: function(marker) {
         marker.addListener('click', function() {
             this.setAnimation(google.maps.Animation.BOUNCE);
             setTimeout(function() {
-            marker.setAnimation(null)
-            }, 3000);    
+                marker.setAnimation(null);
+            }, 3000);
             populateInfoWindow(this, largeInfowindow);
             searchedForText = this.title;
             ViewModel.startFetch(marker); //startFetch() function is with which the data is extracted from wikipedia
@@ -295,8 +295,8 @@ var ViewModel = {
 
         markers[index].setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function() {
-        markers[index].setAnimation(null)
-        }, 3000);    
+            markers[index].setAnimation(null);
+        }, 3000);
 
 
         populateInfoWindow(markers[index], largeInfowindow);
@@ -318,41 +318,41 @@ var ViewModel = {
 
     },
 
-/* #########fetching image from unsplash*/
+    /* #########fetching image from unsplash*/
 
     startFetch: function(marker) {
         fetch(`https://api.unsplash.com/search/photos?page=1&query=${searchedForText}`, {
-                    headers: {
-                        Authorization: 'Client-ID 2bf09a9320982ae6511f0558183ae40b0a498c1512ee2c28a7ee02e476eb3419'
-                    }
-                }).then(response => response.json())
-                .then(addImage)
-                .catch(e => requestError(e, 'image'));
+                headers: {
+                    Authorization: 'Client-ID 2bf09a9320982ae6511f0558183ae40b0a498c1512ee2c28a7ee02e476eb3419'
+                }
+            }).then(response => response.json())
+            .then(addImage)
+            .catch(e => requestError(e, 'image'));
 
-         //function call for fetch
-            function addImage(data) {
-                    let htmlContent = '';
-                    const firstImage = data.results[0];
+        //function call for fetch
+        function addImage(data) {
+            let htmlContent = '';
+            const firstImage = data.results[0];
 
-                    if (firstImage) {
-                        htmlContent = `<figure>
+            if (firstImage) {
+                htmlContent = `<figure>
                             <img src="${firstImage.urls.small}" alt="${searchedForText}">
                             <figcaption>${searchedForText} by ${firstImage.user.name}</figcaption>
                         </figure>`;
-                    } else {
-                        htmlContent = 'Unfortunately, no image was returned for your search.'
-                    }
+            } else {
+                htmlContent = 'Unfortunately, no image was returned for your search.';
+            }
 
-                    largeInfowindow.setContent('<div>' + htmlContent + '</div>');
+            largeInfowindow.setContent('<div>' + htmlContent + '</div>');
 
-                }
+        }
 
         //catch function for image from unsplash
-            function requestError(e, part) {
-                    console.log(e);
-                    largeInfowindow.setContent(`<p class="network-warning">Oh no! There was an error making a request.</p>`);
-            }
-    }    
+        function requestError(e, part) {
+            console.log(e);
+            largeInfowindow.setContent(`<p class="network-warning">Oh no! There was an error making a request.</p>`);
+        }
+    }
 
 };
 
