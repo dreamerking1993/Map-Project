@@ -211,7 +211,6 @@ function placeMarker(place) {
 
     }
 }
-//when marker in the map is clicked
 var MarkerProp = {
     markerMouseOver: function(marker) {
         marker.addListener('mouseover', function() {
@@ -227,9 +226,13 @@ var MarkerProp = {
 
     },
 
-
+//when marker in the map is clicked
     markerClick: function(marker) {
         marker.addListener('click', function() {
+            this.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(function() {
+            marker.setAnimation(null)
+            }, 3000);    
             populateInfoWindow(this, largeInfowindow);
             searchedForText = this.title;
             startFetch(100, 200); //startFetch() function is with which the data is extracted from wikipedia
@@ -290,6 +293,13 @@ var ViewModel = {
     //when a marker or the list item is clicked, this function is called
     popInfo: function(place) {
         var index = locations.indexOf(place);
+
+            markers[index].setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(function() {
+            markers[index].setAnimation(null)
+            }, 3000);    
+
+
         populateInfoWindow(markers[index], largeInfowindow);
         searchedForText = place.title;
         startFetch(100, 200);
