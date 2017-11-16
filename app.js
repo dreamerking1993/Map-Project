@@ -1,7 +1,4 @@
-var map, largeInfowindow, defaultIcon, bounds, highlightedIcon;
-var textbox = document.getElementById("textbox");
-var tempscript = null,
-    minchars, maxchars, attempts;
+var map, largeInfowindow, defaultIcon, bounds, highlightedIcon, text;
 let searchedForText;
 var markers = [];
 var locations = [{
@@ -12,14 +9,14 @@ var locations = [{
         }
     },
     {
-        title: 'Bhaktapur Durbar Square',
+        title: 'Bhaktapur, Nepal',
         location: {
             lat: 27.6721,
             lng: 85.4283
         }
     },
     {
-        title: 'Patan Durbar Square',
+        title: 'Patan',
         location: {
             lat: 27.6727,
             lng: 85.3253
@@ -54,14 +51,14 @@ var locations = [{
         }
     },
     {
-        title: 'Boudhanat',
+        title: 'Boudhanath Stupa',
         location: {
             lat: 27.7214,
             lng: 85.3619
         }
     },
     {
-        title: 'Changu Narayan',
+        title: 'Changu Narayan Temple',
         location: {
             lat: 27.7162,
             lng: 85.4278
@@ -155,6 +152,7 @@ if ($(window).width() > 1150) {
     $('.container .options-box').addClass('hideMenu');
 }
 
+
 //initMap is the callback function of the asyncrhronous request made on HTML file
 function initMap() {
 
@@ -235,7 +233,7 @@ var MarkerProp = {
             }, 3000);    
             populateInfoWindow(this, largeInfowindow);
             searchedForText = this.title;
-            startFetch(100, 200); //startFetch() function is with which the data is extracted from wikipedia
+            ViewModel.startFetch(marker); //startFetch() function is with which the data is extracted from wikipedia
 
         });
     }
@@ -257,7 +255,7 @@ function populateInfoWindow(marker, infowindow) {
     // Check to make sure the infowindow is not already opened on this marker.
     if (infowindow.marker != marker) {
         infowindow.marker = marker;
-        infowindow.setContent('<div>' + marker.title + '</div>');
+        //infowindow.setContent('div'+ marker.title +'div');
         infowindow.open(map, marker);
         // Make sure the marker property is cleared if the infowindow is closed.
         infowindow.addListener('closeclick', function() {
@@ -267,6 +265,7 @@ function populateInfoWindow(marker, infowindow) {
 }
 //the following is the ViewModel in this knockoutjs framework
 var ViewModel = {
+    textt: ko.observable(),
     self: this,
     query: ko.observable(''),
     locationList: ko.observableArray([]),
@@ -294,15 +293,15 @@ var ViewModel = {
     popInfo: function(place) {
         var index = locations.indexOf(place);
 
-            markers[index].setAnimation(google.maps.Animation.BOUNCE);
-            setTimeout(function() {
-            markers[index].setAnimation(null)
-            }, 3000);    
+        markers[index].setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(function() {
+        markers[index].setAnimation(null)
+        }, 3000);    
 
 
         populateInfoWindow(markers[index], largeInfowindow);
         searchedForText = place.title;
-        startFetch(100, 200);
+        ViewModel.startFetch(markers[index]);
     },
     //responsive for the filtering action
     search: function(value) {
@@ -317,56 +316,50 @@ var ViewModel = {
             }
         }
 
-    }
+    },
+
+/* #########fetching image from unsplash*/
+
+    startFetch: function(marker) {
+        fetch(`https://api.unsplash.com/search/photos?page=1&query=${searchedForText}`, {
+                    headers: {
+                        Authorization: 'Client-ID 2bf09a9320982ae6511f0558183ae40b0a498c1512ee2c28a7ee02e476eb3419'
+                    }
+                }).then(response => response.json())
+                .then(addImage)
+                .catch(e => requestError(e, 'image'));
+
+         //function call for fetch
+            function addImage(data) {
+                    let htmlContent = '';
+                    const firstImage = data.results[0];
+
+                    if (firstImage) {
+                        htmlContent = `<figure>
+                            <img src="${firstImage.urls.small}" alt="${searchedForText}">
+                            <figcaption>${searchedForText} by ${firstImage.user.name}</figcaption>
+                        </figure>`;
+                    } else {
+                        htmlContent = 'Unfortunately, no image was returned for your search.'
+                    }
+
+                    largeInfowindow.setContent('<div>' + htmlContent + '</div>');
+
+                }
+
+        //catch function for image from unsplash
+            function requestError(e, part) {
+                    console.log(e);
+                    largeInfowindow.setContent(`<p class="network-warning">Oh no! There was an error making a request.</p>`);
+            }
+    }    
 
 };
 
-/* #########fetching data from wikipedia*/
-
-function startFetch(minimumCharacters, maximumCharacters, isRetry) {
-
-$.ajax({
-    url: "https://en.wikipedia.org/w/api.php",
-    data: {
-        format: "json",
-        action: "parse",
-        page: searchedForText,
-        prop:"text",
-        section:0,
-    },
-    dataType: 'jsonp',
-  /*  headers: {
-        'x-my-custom-header': 'some value'
-    }, */
-    success: function (data) {
-        console.log(data)
-  //     $("#article").html(data.parse.text["*"])
-        
-        var markup = data.parse.text["*"];
-        var i = $('<div></div>').html(markup);
-        
-        // remove links as they will not work
-        i.find('a').each(function() { $(this).replaceWith($(this).html()); });
-        
-        // remove any references
-        i.find('sup').remove();
-        
-        // remove cite error
-        i.find('.mw-ext-cite-error').remove();
-
-        s = $(i).find('p');
-        
-        $('#article').html(s);
-
-
-    }
-});
+//if the map cannot be loaded
+function noMap() {
+    alert("the request to googleapis.com was unsuccessful, try again");
 }
-
-
-
-
-
 
 
 ViewModel.ram();

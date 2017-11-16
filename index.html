@@ -19,9 +19,9 @@
         <div class="options-box">
             <h2>Extract from Wikipedia</h2>
             <div>
-                <div id="article"></div>
+                <div id="article" data-bind="html: textt"></div>
 
-                <input id="filter-text" type="search" placeholder="Enter what you want to filter" data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off">
+                <input id="filter-text" type="search" placeholder="Filter location you want" data-bind="value: query, valueUpdate: 'keyup'" autocomplete="off">
             </div>
             <ul id="location-list" data-bind="foreach: locationList">
                 <li>
@@ -29,11 +29,12 @@
                 </li>
             </ul>
         </div>
-        <div id="map"></div>
+        <div id="map">Map not Loaded. Try Again</div>
     </div>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6UxP3FZOY5rLgBbe_aG201JJr2kbIeoA&v=3&callback=initMap"></script>
     <script src="knockout-3.2.0.js"></script>
     <script src="app.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD6UxP3FZOY5rLgBbe_aG201JJr2kbIeoA&v=3&callback=initMap" onerror="noMap()"></script>
+
 </body>
 
 </html>
